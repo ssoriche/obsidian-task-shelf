@@ -4,6 +4,6 @@
 	"version": "0.1.0",
 	"minAppVersion": "1.0.0",
 	"description": "Quick-capture modal for creating TaskNotes-compatible task notes with auto-filled source, context linking, and natural language date scheduling.",
-	"author": "",
+	"author": "Shawn Sorichetti",
 	"isDesktopOnly": false
 }
