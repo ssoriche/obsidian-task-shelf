@@ -62,11 +62,11 @@ export class SettingsTab extends PluginSettingTab {
             .addDropdown((drop) =>
                 drop
                     .addOption('low', 'Low')
-                    .addOption('medium', 'Medium')
+                    .addOption('normal', 'Normal')
                     .addOption('high', 'High')
                     .setValue(this.plugin.settings.defaultPriority)
                     .onChange(async (value) => {
-                        this.plugin.settings.defaultPriority = value as 'low' | 'medium' | 'high';
+                        this.plugin.settings.defaultPriority = value as 'low' | 'normal' | 'high';
                         await this.plugin.saveSettings();
                     })
             );

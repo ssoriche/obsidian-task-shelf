@@ -11,7 +11,8 @@ export class TaskShelfModal extends Modal {
     private contextFile: TFile | null = null;
     private contextValue = '';
     private scheduledValue = '';
-    private priority: 'low' | 'medium' | 'high';
+    private scheduledManuallyEdited = false;
+    private priority: 'low' | 'normal' | 'high';
     private sourceValue = '';
 
     private contextDisplayEl: HTMLSpanElement | null = null;
@@ -79,7 +80,10 @@ export class TaskShelfModal extends Modal {
 
         setting.addText((text) => {
             text.setPlaceholder('Next thursday, or 2026-04-03')
-                .onChange((value) => { this.scheduledValue = value; });
+                .onChange((value) => {
+                    this.scheduledValue = value;
+                    this.scheduledManuallyEdited = true;
+                });
             text.inputEl.addEventListener('blur', () => this.updateResolvedDate());
             this.scheduledInputEl = text.inputEl;
         });
@@ -89,7 +93,7 @@ export class TaskShelfModal extends Modal {
         const setting = new Setting(container).setName('Priority');
 
         const group = setting.controlEl.createDiv({ cls: 'task-shelf-priority-group' });
-        const priorities: Array<'low' | 'medium' | 'high'> = ['low', 'medium', 'high'];
+        const priorities: Array<'low' | 'normal' | 'high'> = ['low', 'normal', 'high'];
 
         const buttons: HTMLButtonElement[] = [];
 
@@ -152,6 +156,13 @@ export class TaskShelfModal extends Modal {
         const date = await getNextDateFromMOC(this.app, file);
         if (!date) return;
 
+        // Discard stale result if the user chose a different context while
+        // the metadata lookup was in flight.
+        if (this.contextFile !== file) return;
+
+        // Don't overwrite a date the user has already typed manually.
+        if (this.scheduledManuallyEdited) return;
+
         this.scheduledValue = date;
         if (this.scheduledInputEl) {
             this.scheduledInputEl.value = date;
@@ -175,7 +186,16 @@ export class TaskShelfModal extends Modal {
             return;
         }
 
-        const resolved = this.scheduledValue.trim() ? resolveDate(this.scheduledValue) : '';
+        const rawScheduled = this.scheduledValue.trim();
+        let resolvedScheduled = '';
+        if (rawScheduled) {
+            const resolved = resolveDate(rawScheduled);
+            if (!resolved) {
+                new Notice('Scheduled date could not be parsed — please enter a valid date or clear the field');
+                return;
+            }
+            resolvedScheduled = resolved;
+        }
 
         const data: TaskData = {
             title: this.titleValue.trim(),
@@ -183,7 +203,7 @@ export class TaskShelfModal extends Modal {
             priority: this.priority,
             source: this.sourceValue,
             context: this.contextValue,
-            scheduled: resolved ?? '',
+            scheduled: resolvedScheduled,
         };
 
         try {
