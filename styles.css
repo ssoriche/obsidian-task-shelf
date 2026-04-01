@@ -11,6 +11,15 @@
     cursor: pointer;
 }
 
+.task-shelf-priority-group button:hover {
+    background-color: var(--background-modifier-hover);
+}
+
+.task-shelf-priority-group button:focus-visible {
+    box-shadow: 0 0 0 2px var(--interactive-accent);
+    outline: none;
+}
+
 .task-shelf-priority-group button.is-active {
     background-color: var(--interactive-accent);
     color: var(--text-on-accent);
