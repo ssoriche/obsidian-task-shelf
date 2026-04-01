@@ -1,7 +1,7 @@
 name: Dependabot auto-fix
 
 on:
-    pull_request:
+    pull_request_target:
         paths:
             - 'package.json'
 
@@ -24,7 +24,7 @@ jobs:
             - name: Setup Bun
               uses: oven-sh/setup-bun@v2
               with:
-                  bun-version: latest
+                  bun-version: '1.2'
 
             - name: Regenerate lockfile
               run: |
