@@ -26,7 +26,7 @@ function buildFrontmatter(settings: TaskShelfSettings, data: TaskData): string {
         lines.push(`${settings.contextPropertyName}: ${yamlScalar(data.context)}`);
     }
     if (data.scheduled) {
-        lines.push(`${settings.scheduledPropertyName}: ${data.scheduled}`);
+        lines.push(`${settings.scheduledPropertyName}: ${yamlScalar(data.scheduled)}`);
     }
 
     lines.push('---');
@@ -51,12 +51,13 @@ function resolveFilePath(app: App, folderPath: string, baseName: string): string
     const base = `${folderPath}/${baseName}.md`;
     if (!app.vault.getAbstractFileByPath(base)) return base;
 
-    let counter = 2;
-    while (true) {
+    const MAX_ATTEMPTS = 1000;
+    for (let counter = 2; counter <= MAX_ATTEMPTS; counter++) {
         const candidate = `${folderPath}/${baseName} (${counter}).md`;
         if (!app.vault.getAbstractFileByPath(candidate)) return candidate;
-        counter++;
     }
+
+    throw new Error(`Could not find a free filename for "${baseName}" after ${MAX_ATTEMPTS} attempts`);
 }
 
 export async function create(app: App, settings: TaskShelfSettings, data: TaskData): Promise<TFile> {

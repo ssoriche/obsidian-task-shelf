@@ -9,6 +9,10 @@ if (!targetVersion) {
 // read minAppVersion from manifest.json and bump version to target version
 const manifest = JSON.parse(readFileSync("manifest.json", "utf8"));
 const { minAppVersion } = manifest;
+if (!minAppVersion) {
+    console.error("manifest.json is missing a valid minAppVersion field.");
+    process.exit(1);
+}
 manifest.version = targetVersion;
 writeFileSync("manifest.json", JSON.stringify(manifest, null, "\t"));
 
