@@ -28,7 +28,7 @@ jobs:
 
             - name: Regenerate lockfile
               run: |
-                  bun install
+                  bun install --ignore-scripts
                   git config --global user.name 'github-actions[bot]'
                   git config --global user.email 'github-actions[bot]@users.noreply.github.com'
                   if [ -n "$(git status --porcelain bun.lock* 2>/dev/null)" ]; then
