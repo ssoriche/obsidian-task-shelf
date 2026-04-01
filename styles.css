@@ -1,0 +1,29 @@
+/* Priority button group */
+.task-shelf-priority-group {
+    display: flex;
+    gap: 4px;
+}
+
+.task-shelf-priority-group button {
+    flex: 1;
+    padding: 4px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.task-shelf-priority-group button.is-active {
+    background-color: var(--interactive-accent);
+    color: var(--text-on-accent);
+}
+
+/* Resolved date indicator */
+.task-shelf-resolved-date {
+    font-size: var(--font-smaller);
+    color: var(--text-muted);
+    margin-left: 8px;
+}
+
+/* Context display */
+.task-shelf-context-display {
+    font-weight: var(--bold-weight);
+}
