@@ -13,6 +13,9 @@ function toISODateString(date: Date): string {
 
 export function resolve(input: string): string | null {
     if (ISO_DATE_RE.test(input)) {
+        // Round-trip through Date to reject semantically invalid dates (e.g. 2026-02-30).
+        const d = new Date(input + 'T00:00:00');
+        if (isNaN(d.getTime()) || toISODateString(d) !== input) return null;
         return input;
     }
     const parsed = chrono.parseDate(input, new Date(), { forwardDate: true });

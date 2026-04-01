@@ -154,14 +154,21 @@ export class TaskShelfModal extends Modal {
 
     private async prefillScheduledFromMOC(file: TFile) {
         const date = await getNextDateFromMOC(this.app, file);
-        if (!date) return;
 
-        // Discard stale result if the user chose a different context while
-        // the metadata lookup was in flight.
+        // Discard stale result if the user chose a different context
+        // while the metadata lookup was in flight.
         if (this.contextFile !== file) return;
 
-        // Don't overwrite a date the user has already typed manually.
+        // Don't touch a date the user has typed manually.
         if (this.scheduledManuallyEdited) return;
+
+        if (!date) {
+            // New context has no future dates — clear any previously auto-filled date.
+            this.scheduledValue = '';
+            if (this.scheduledInputEl) this.scheduledInputEl.value = '';
+            this.updateResolvedDate();
+            return;
+        }
 
         this.scheduledValue = date;
         if (this.scheduledInputEl) {
