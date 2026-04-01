@@ -79,7 +79,9 @@ export class SettingsTab extends PluginSettingTab {
                     .setPlaceholder('todo') // eslint-disable-line obsidianmd/ui/sentence-case
                     .setValue(this.plugin.settings.defaultStatus)
                     .onChange(async (value) => {
-                        this.plugin.settings.defaultStatus = value;
+                        const trimmed = value.trim();
+                        if (!trimmed) return;
+                        this.plugin.settings.defaultStatus = trimmed;
                         await this.plugin.saveSettings();
                     })
             );
@@ -95,7 +97,7 @@ export class SettingsTab extends PluginSettingTab {
                     .setValue(this.plugin.settings.sourcePropertyName)
                     .onChange(async (value) => {
                         const trimmed = value.trim();
-                        if (!trimmed) return;
+                        if (!trimmed || !/^[A-Za-z0-9_-]+$/.test(trimmed)) return;
                         this.plugin.settings.sourcePropertyName = trimmed;
                         await this.plugin.saveSettings();
                     })
@@ -110,7 +112,7 @@ export class SettingsTab extends PluginSettingTab {
                     .setValue(this.plugin.settings.contextPropertyName)
                     .onChange(async (value) => {
                         const trimmed = value.trim();
-                        if (!trimmed) return;
+                        if (!trimmed || !/^[A-Za-z0-9_-]+$/.test(trimmed)) return;
                         this.plugin.settings.contextPropertyName = trimmed;
                         await this.plugin.saveSettings();
                     })
@@ -125,7 +127,7 @@ export class SettingsTab extends PluginSettingTab {
                     .setValue(this.plugin.settings.scheduledPropertyName)
                     .onChange(async (value) => {
                         const trimmed = value.trim();
-                        if (!trimmed) return;
+                        if (!trimmed || !/^[A-Za-z0-9_-]+$/.test(trimmed)) return;
                         this.plugin.settings.scheduledPropertyName = trimmed;
                         await this.plugin.saveSettings();
                     })
