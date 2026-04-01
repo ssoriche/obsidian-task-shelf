@@ -104,7 +104,7 @@ export class SettingsTab extends PluginSettingTab {
             .setDesc('Frontmatter key used for the context link.')
             .addText((text) =>
                 text
-                    .setPlaceholder('context') // eslint-disable-line obsidianmd/ui/sentence-case
+                    .setPlaceholder('contexts') // eslint-disable-line obsidianmd/ui/sentence-case
                     .setValue(this.plugin.settings.contextPropertyName)
                     .onChange(async (value) => {
                         this.plugin.settings.contextPropertyName = value;
