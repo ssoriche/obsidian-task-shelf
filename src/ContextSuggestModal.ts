@@ -1,6 +1,8 @@
 import { App, FuzzySuggestModal, TFile } from 'obsidian';
 import { TaskShelfSettings } from './types';
 
+const NEVER_MATCH = /$a/;
+
 export class ContextSuggestModal extends FuzzySuggestModal<TFile> {
     private settings: TaskShelfSettings;
     private onChoose: (file: TFile) => void;
@@ -12,8 +14,14 @@ export class ContextSuggestModal extends FuzzySuggestModal<TFile> {
     }
 
     getItems(): TFile[] {
-        const prefix = this.settings.contextFolderPath + '/';
-        const excludeRe = new RegExp(this.settings.contextExcludePattern);
+        const prefix = this.settings.contextFolderPath.replace(/\/$/, '') + '/';
+
+        let excludeRe: RegExp;
+        try {
+            excludeRe = new RegExp(this.settings.contextExcludePattern);
+        } catch {
+            excludeRe = NEVER_MATCH;
+        }
 
         return this.app.vault
             .getMarkdownFiles()

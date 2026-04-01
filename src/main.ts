@@ -36,8 +36,13 @@ export default class TaskShelfPlugin extends Plugin {
         if (!this.app.vault.getAbstractFileByPath(folder)) {
             try {
                 await this.app.vault.createFolder(folder);
-            } catch {
-                // Folder may have been created between check and create; ignore
+            } catch (err) {
+                // Suppress only the TOCTOU race where another process created
+                // the folder between our existence check and createFolder call.
+                if (err instanceof Error && err.message.toLowerCase().includes('already exists')) {
+                    return;
+                }
+                throw err;
             }
         }
     }
