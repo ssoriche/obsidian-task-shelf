@@ -1,0 +1,4 @@
+reviews:
+  path_filters:
+    # Bundled third-party TaskNotes view presets — not our code, exclude from review
+    - "!test-vault/TaskNotes/Views/**"
