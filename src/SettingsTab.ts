@@ -94,7 +94,9 @@ export class SettingsTab extends PluginSettingTab {
                     .setPlaceholder('source') // eslint-disable-line obsidianmd/ui/sentence-case
                     .setValue(this.plugin.settings.sourcePropertyName)
                     .onChange(async (value) => {
-                        this.plugin.settings.sourcePropertyName = value;
+                        const trimmed = value.trim();
+                        if (!trimmed) return;
+                        this.plugin.settings.sourcePropertyName = trimmed;
                         await this.plugin.saveSettings();
                     })
             );
@@ -107,7 +109,9 @@ export class SettingsTab extends PluginSettingTab {
                     .setPlaceholder('contexts') // eslint-disable-line obsidianmd/ui/sentence-case
                     .setValue(this.plugin.settings.contextPropertyName)
                     .onChange(async (value) => {
-                        this.plugin.settings.contextPropertyName = value;
+                        const trimmed = value.trim();
+                        if (!trimmed) return;
+                        this.plugin.settings.contextPropertyName = trimmed;
                         await this.plugin.saveSettings();
                     })
             );
@@ -120,7 +124,9 @@ export class SettingsTab extends PluginSettingTab {
                     .setPlaceholder('scheduled') // eslint-disable-line obsidianmd/ui/sentence-case
                     .setValue(this.plugin.settings.scheduledPropertyName)
                     .onChange(async (value) => {
-                        this.plugin.settings.scheduledPropertyName = value;
+                        const trimmed = value.trim();
+                        if (!trimmed) return;
+                        this.plugin.settings.scheduledPropertyName = trimmed;
                         await this.plugin.saveSettings();
                     })
             );
