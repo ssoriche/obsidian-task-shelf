@@ -7,17 +7,23 @@ function sanitizeFilename(title: string): string {
     return title.replace(UNSAFE_FILENAME_CHARS, '-').trim();
 }
 
+/** Escape a string value for safe embedding in YAML frontmatter. */
+function yamlScalar(value: string): string {
+    return JSON.stringify(value);
+}
+
 function buildFrontmatter(settings: TaskShelfSettings, data: TaskData): string {
     const lines: string[] = ['---'];
 
-    lines.push(`status: ${data.status}`);
-    lines.push(`priority: ${data.priority}`);
+    lines.push(`status: ${yamlScalar(data.status)}`);
+    lines.push(`priority: ${yamlScalar(data.priority)}`);
+    lines.push('tags: [task]');
 
     if (data.source) {
-        lines.push(`${settings.sourcePropertyName}: "${data.source}"`);
+        lines.push(`${settings.sourcePropertyName}: ${yamlScalar(data.source)}`);
     }
     if (data.context) {
-        lines.push(`${settings.contextPropertyName}: "${data.context}"`);
+        lines.push(`${settings.contextPropertyName}: ${yamlScalar(data.context)}`);
     }
     if (data.scheduled) {
         lines.push(`${settings.scheduledPropertyName}: ${data.scheduled}`);
@@ -32,8 +38,11 @@ async function ensureFolder(app: App, folderPath: string): Promise<void> {
     if (!app.vault.getAbstractFileByPath(folderPath)) {
         try {
             await app.vault.createFolder(folderPath);
-        } catch {
-            // Created concurrently; ignore
+        } catch (err) {
+            if (err instanceof Error && err.message.toLowerCase().includes('already exists')) {
+                return;
+            }
+            throw err;
         }
     }
 }

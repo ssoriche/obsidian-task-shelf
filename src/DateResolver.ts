@@ -40,5 +40,6 @@ export async function getNextDateFromMOC(app: App, mocFile: TFile): Promise<stri
     if (futureDates.length === 0) return null;
 
     futureDates.sort();
-    return futureDates[0] ?? null;
+    // Length is guaranteed > 0 by the guard above; cast away the undefined.
+    return futureDates[0] as string;
 }
