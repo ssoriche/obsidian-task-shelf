@@ -3,6 +3,7 @@ import * as chrono from 'chrono-node';
 
 const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const DATE_IN_LINK_RE = /(\d{4}-\d{2}-\d{2})/;
+const FOLDER_DATE_RE = /(\d{4})\/\d{2}-[A-Za-z]+\/(\d{2})-(\d{2})-[A-Za-z]/;
 
 function toISODateString(date: Date): string {
     const y = date.getFullYear();
@@ -31,12 +32,22 @@ export async function getNextDateFromMOC(app: App, mocFile: TFile): Promise<stri
 
     const futureDates = cache.links
         .flatMap((link) => {
-            const sources = [link.link, link.displayText ?? ''];
-            return sources.flatMap((s) => {
-                const match = DATE_IN_LINK_RE.exec(s);
-                const captured = match?.[1];
-                return captured ? [captured] : [];
-            });
+            // Strategy 1: ISO date in link text or display text
+            const isoMatch =
+                DATE_IN_LINK_RE.exec(link.link) ?? DATE_IN_LINK_RE.exec(link.displayText ?? '');
+            if (isoMatch?.[1]) return [isoMatch[1]];
+
+            // Strategy 2: extract date from folder structure in the path
+            // Works whether or not the target file exists yet.
+            // Prefer the resolved vault path (more canonical); fall back to link.link itself
+            // e.g. link.link = "2026/04-April/04-08-Wednesday Core Weekly"
+            // e.g. resolved.path = "Meetings/Core Weekly/2026/04-April/04-08-Wednesday Core Weekly.md"
+            const resolved = app.metadataCache.getFirstLinkpathDest(link.link, mocFile.path);
+            const pathToMatch = resolved?.path ?? link.link;
+            const m = FOLDER_DATE_RE.exec(pathToMatch);
+            if (m) return [`${m[1]}-${m[2]}-${m[3]}`];
+
+            return [];
         })
         .filter((date) => date >= today);
 
