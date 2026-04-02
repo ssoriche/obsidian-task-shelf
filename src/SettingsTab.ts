@@ -43,12 +43,10 @@ export class SettingsTab extends PluginSettingTab {
 
         new Setting(containerEl)
             .setName('Context exclude pattern')
-            .setDesc(
-                'Regex pattern for context note basenames to exclude. Use \\d{4}-\\d{2}-\\d{2} to hide ISO-dated notes (2026-03-31) or ^\\d{2}-\\d{2}- to hide MM-DD-prefixed notes (10-16-Wednesday Meeting).'
-            )
+            .setDesc('Regex pattern for context note basenames to exclude — dated instance notes like 2026-03-31.')
             .addText((text) =>
                 text
-                    .setPlaceholder('^\\d{2}-\\d{2}-')
+                    .setPlaceholder('\\d{4}-\\d{2}-\\d{2}')
                     .setValue(this.plugin.settings.contextExcludePattern)
                     .onChange(async (value) => {
                         this.plugin.settings.contextExcludePattern = value;
