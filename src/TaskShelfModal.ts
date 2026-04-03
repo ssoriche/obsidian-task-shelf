@@ -1,11 +1,13 @@
 import { App, Modal, Notice, Setting, TFile } from 'obsidian';
-import { TaskData, TaskShelfSettings } from './types';
+import { TaskData, TaskShelfSettings, EffectiveSettings } from './types';
 import { ContextSuggestModal } from './ContextSuggestModal';
 import { resolve as resolveDate, getNextDateFromMOC } from './DateResolver';
 import { create as createTask } from './TaskCreator';
+import { loadTaskNotesConfig, resolveEffectiveSettings } from './TaskNotesConfig';
 
 export class TaskShelfModal extends Modal {
     private settings: TaskShelfSettings;
+    private effectiveSettings: EffectiveSettings;
 
     private titleValue = '';
     private contextFile: TFile | null = null;
@@ -22,10 +24,15 @@ export class TaskShelfModal extends Modal {
     constructor(app: App, settings: TaskShelfSettings) {
         super(app);
         this.settings = settings;
-        this.priority = settings.defaultPriority;
+        this.effectiveSettings = resolveEffectiveSettings(settings, null);
+        this.priority = this.effectiveSettings.defaultPriority;
     }
 
-    onOpen() {
+    async onOpen() {
+        const tnConfig = await loadTaskNotesConfig(this.app);
+        this.effectiveSettings = resolveEffectiveSettings(this.settings, tnConfig);
+        this.priority = this.effectiveSettings.defaultPriority;
+
         const { contentEl } = this;
         contentEl.empty();
 
@@ -65,7 +72,7 @@ export class TaskShelfModal extends Modal {
         setting.addButton((btn) => {
             btn.setButtonText('Choose...')
                 .onClick(() => {
-                    new ContextSuggestModal(this.app, this.settings, (file) => {
+                    new ContextSuggestModal(this.app, this.effectiveSettings, (file) => {
                         this.onContextChosen(file);
                     }).open();
                 });
@@ -131,7 +138,7 @@ export class TaskShelfModal extends Modal {
     }
 
     private initSource() {
-        if (!this.settings.autoFillSourceFromActiveFile) return;
+        if (!this.effectiveSettings.autoFillSourceFromActiveFile) return;
         const activeFile = this.app.workspace.getActiveFile();
         if (!activeFile) return;
 
@@ -206,7 +213,7 @@ export class TaskShelfModal extends Modal {
 
         const data: TaskData = {
             title: this.titleValue.trim(),
-            status: this.settings.defaultStatus,
+            status: this.effectiveSettings.defaultStatus,
             priority: this.priority,
             source: this.sourceValue,
             context: this.contextValue,
@@ -214,7 +221,7 @@ export class TaskShelfModal extends Modal {
         };
 
         try {
-            const file = await createTask(this.app, this.settings, data);
+            const file = await createTask(this.app, this.effectiveSettings, data);
             new Notice(`Task created: ${file.basename}`);
             this.close();
         } catch (err) {
