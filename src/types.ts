@@ -22,6 +22,13 @@ export const DEFAULT_SETTINGS: TaskShelfSettings = {
     autoFillSourceFromActiveFile: true,
 };
 
+export interface EffectiveSettings extends TaskShelfSettings {
+    taskTag: string;
+    filenameFormat: 'zettel' | 'custom';
+    storeTitleInFilename: boolean;
+    customFilenameTemplate: string;
+}
+
 export interface TaskData {
     title: string;
     status: string;
