@@ -13,7 +13,9 @@ export default tseslint.config(
 				projectService: {
 					allowDefaultProject: [
 						'eslint.config.mts',
-						'manifest.json'
+						'manifest.json',
+						'tests/*.ts',
+						'tests/__mocks__/*.ts'
 					]
 				},
 				tsconfigRootDir: import.meta.dirname,
