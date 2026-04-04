@@ -1,13 +1,13 @@
 import { App, FuzzySuggestModal, TFile } from 'obsidian';
-import { TaskShelfSettings } from './types';
+import { TaskShelfSettings, EffectiveSettings } from './types';
 
 const NEVER_MATCH = /$a/;
 
 export class ContextSuggestModal extends FuzzySuggestModal<TFile> {
-    private settings: TaskShelfSettings;
+    private settings: TaskShelfSettings | EffectiveSettings;
     private onChoose: (file: TFile) => void;
 
-    constructor(app: App, settings: TaskShelfSettings, onChoose: (file: TFile) => void) {
+    constructor(app: App, settings: TaskShelfSettings | EffectiveSettings, onChoose: (file: TFile) => void) {
         super(app);
         this.settings = settings;
         this.onChoose = onChoose;

@@ -1,0 +1,11 @@
+{
+    "taskFolderPath": "TaskNotes/Tasks",
+    "contextFolderPath": "Meetings",
+    "contextExcludePattern": "\\d{4}-\\d{2}-\\d{2}|^\\d{2}-\\d{2}-",
+    "defaultPriority": "normal",
+    "defaultStatus": "todo",
+    "sourcePropertyName": "source",
+    "contextPropertyName": "contexts",
+    "scheduledPropertyName": "scheduled",
+    "autoFillSourceFromActiveFile": true
+}
