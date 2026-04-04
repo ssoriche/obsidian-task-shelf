@@ -2,9 +2,9 @@ import { describe, it, expect, mock, beforeAll, afterAll, setSystemTime } from '
 
 void mock.module('obsidian', () => import('./__mocks__/obsidian'));
 
-import { generateBaseName } from '../src/TaskCreator';
+import { generateBaseName, buildFrontmatter } from '../src/TaskCreator';
 import { DEFAULT_SETTINGS } from '../src/types';
-import type { EffectiveSettings } from '../src/types';
+import type { EffectiveSettings, TaskData } from '../src/types';
 
 const baseEffective: EffectiveSettings = {
     ...DEFAULT_SETTINGS,
@@ -80,6 +80,49 @@ describe('generateBaseName', () => {
             };
             expect(generateBaseName('x', settings)).toBe('2026-01-05 x');
             setSystemTime(0);
+        });
+    });
+
+    describe('title format', () => {
+        it('includes title in frontmatter', () => {
+            const data: TaskData = {
+                title: 'My Task Name',
+                status: 'todo',
+                priority: 'normal',
+                source: '',
+                context: '',
+                scheduled: '',
+            };
+            const result = buildFrontmatter(baseEffective, data);
+            expect(result).toContain('title: "My Task Name"');
+        });
+
+        it('places title before status in frontmatter', () => {
+            const data: TaskData = {
+                title: 'First',
+                status: 'done',
+                priority: 'normal',
+                source: '',
+                context: '',
+                scheduled: '',
+            };
+            const result = buildFrontmatter(baseEffective, data);
+            const titlePos = result.indexOf('title:');
+            const statusPos = result.indexOf('status:');
+            expect(titlePos).toBeLessThan(statusPos);
+        });
+
+        it('escapes special characters in title', () => {
+            const data: TaskData = {
+                title: 'Fix: the "bug"',
+                status: 'todo',
+                priority: 'normal',
+                source: '',
+                context: '',
+                scheduled: '',
+            };
+            const result = buildFrontmatter(baseEffective, data);
+            expect(result).toContain('title: "Fix: the \\"bug\\""');
         });
     });
 

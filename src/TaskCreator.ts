@@ -12,9 +12,10 @@ function yamlScalar(value: string): string {
     return JSON.stringify(value);
 }
 
-function buildFrontmatter(settings: EffectiveSettings, data: TaskData): string {
+export function buildFrontmatter(settings: EffectiveSettings, data: TaskData): string {
     const lines: string[] = ['---'];
 
+    lines.push(`title: ${yamlScalar(data.title)}`);
     lines.push(`status: ${yamlScalar(data.status)}`);
     lines.push(`priority: ${yamlScalar(data.priority)}`);
     lines.push(`tags: [${yamlScalar(settings.taskTag)}]`);
