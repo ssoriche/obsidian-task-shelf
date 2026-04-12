@@ -55,14 +55,19 @@ jobs:
             - name: Extract release notes from CHANGELOG.md
               id: changelog
               run: |
-                  version="${GITHUB_REF_NAME#v}"
-                  awk "/^## \[$version\]/{found=1; next} found && /^## \[/{exit} found" CHANGELOG.md > release-notes.md
-                  if [ -s release-notes.md ]; then
-                    echo "has_notes=true" >> "$GITHUB_OUTPUT"
-                  else
+                  if [ ! -f CHANGELOG.md ]; then
                     echo "has_notes=false" >> "$GITHUB_OUTPUT"
-                    rm -f release-notes.md
-                    echo "No CHANGELOG entry for $version — release notes will be auto-generated."
+                  else
+                    version="${GITHUB_REF_NAME#v}"
+                    awk -v ver="$version" \
+                      'index($0, "## [" ver "]") == 1 {found=1; next} found && /^## \[/{exit} found' \
+                      CHANGELOG.md > release-notes.md
+                    if [ -s release-notes.md ]; then
+                      echo "has_notes=true" >> "$GITHUB_OUTPUT"
+                    else
+                      echo "has_notes=false" >> "$GITHUB_OUTPUT"
+                      rm -f release-notes.md
+                    fi
                   fi
 
             - name: Create release (with CHANGELOG notes)
