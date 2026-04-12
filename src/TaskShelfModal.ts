@@ -194,6 +194,15 @@ export class TaskShelfModal extends Modal {
         this.resolvedDateEl.setText(resolved ? `→ ${resolved}` : '⚠ unrecognised date');
     }
 
+    private async applyLinterIfAvailable(file: TFile): Promise<void> {
+        type LinterPlugin = { runLinterFile?: (f: TFile, lintingLastActiveFile?: boolean) => Promise<void> };
+        type AppWithPlugins = { plugins?: { plugins?: Record<string, LinterPlugin> } };
+        const linter = (this.app as unknown as AppWithPlugins).plugins?.plugins?.['obsidian-linter'];
+        if (typeof linter?.runLinterFile === 'function') {
+            await linter.runLinterFile(file, false);
+        }
+    }
+
     private async submit() {
         if (!this.titleValue.trim()) {
             new Notice('Task title is required');
@@ -222,6 +231,11 @@ export class TaskShelfModal extends Modal {
 
         try {
             const file = await createTask(this.app, this.effectiveSettings, data);
+            try {
+                await this.applyLinterIfAvailable(file);
+            } catch (linterErr) {
+                console.warn('obsidian-linter failed on new task file', linterErr);
+            }
             new Notice(`Task created: ${file.basename}`);
             this.close();
         } catch (err) {
