@@ -78,7 +78,8 @@ release:
 	fi
 	@git pull --ff-only origin main
 	@git checkout -b "release/v$(VERSION)"
-	@bun pm version "$(VERSION)" --no-git-tag-version
+	@jq --arg v "$(VERSION)" '.version = $$v' package.json > package.json.tmp && mv package.json.tmp package.json
+	@npm_package_version="$(VERSION)" bun run version-bump.mjs
 	@git add package.json manifest.json versions.json
 	@git commit -m "chore: bump version to $(VERSION)"
 	@git push -u origin "release/v$(VERSION)"
