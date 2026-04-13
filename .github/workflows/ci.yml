@@ -96,7 +96,7 @@ jobs:
               run: git push origin :refs/tags/beta || true
 
             - name: Publish beta pre-release
-              uses: softprops/action-gh-release@v2
+              uses: softprops/action-gh-release@v3
               with:
                   tag_name: beta
                   name: Beta (latest main)
